@@ -12,7 +12,7 @@ def opt(page_references, frame_size):
             page_faults += 1
         else:
             page_hits += 1
-
+    return page_faults, page_hits
 
 page_references = [] # Add page
 frame_size = 3
