@@ -1,23 +1,41 @@
-def opt(page_references, frame_size):
-    page_frames = []
+def optimal_page_replacement(pages, capacity):
+    # List of current pages in memory
+    memory = []
+    # Page fault count
     page_faults = 0
-    page_hits = 0
+    # Keep track of the usage of pages
+    page_usage_dict = {}
 
-    for page in page_references:
-        if page not in page_frames:
-            if len(page_frames) < frame_size:
-                page_frames.append(page)
+    for i in range(len(pages)):
+        # Find out when each page will be used next
+        for j in range(i, len(pages)):
+            if pages[j] in memory:
+                page_usage_dict[pages[j]] = j
             else:
-                print()
+                page_usage_dict[pages[j]] = float('inf')
+
+        # If the page is not present in memory
+        if pages[i] not in memory:
+            # If there is still room in the memory
+            if len(memory) < capacity:
+                memory.append(pages[i])
+            else:
+                # Find the page that will not be used for the longest time in the future
+                furthest_used_page = max(memory, key=lambda page: page_usage_dict[page])
+                # Replace that page with the new page
+                memory[memory.index(furthest_used_page)] = pages[i]
+            # Increment page faults
             page_faults += 1
-        else:
-            page_hits += 1
-    return page_faults, page_hits
 
-page_references = [] # Add page
-frame_size = 3
+        # After processing, remove the page from the usage dictionary if it won't be used again
+        page_usage_dict.pop(pages[i], None)
 
-page_faults, page_hits = opt(page_references, frame_size)
+        # For debug: Print the current memory state
+        print(f"Step {i}: {memory}")
 
-print("Page Faults:", page_faults)
-print("Page Hits:", page_hits)
+    return page_faults
+
+# Example usage
+pages = []
+capacity = 3
+print(f"Total page faults using Optimal Page Replacement: {optimal_page_replacement(pages, capacity)}")
